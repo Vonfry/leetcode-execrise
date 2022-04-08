@@ -10,6 +10,6 @@ stdenv.mkDerivation {
 
   buildPhase = ''
     mkdir -p $out/bin
-    rustc ./solution.rs -out-dir $out/bin
+    rustc --out-dir $out/bin ./solution.rs
   '';
 }
