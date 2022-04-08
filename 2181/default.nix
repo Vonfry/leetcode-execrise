@@ -1,10 +1,15 @@
-{ rustPlatform }:
+{ stdenv, rustc }:
 
-rustPlatform.buildRustPackage rec {
+stdenv.mkDerivation {
   pname = "leetcode-cn_2181";
   version = "0.0.1";
 
   src = ./.;
 
-  cargoSha256 = "";
+  nativeBuildInputs = [ rustc ];
+
+  buildPhase = ''
+    mkdir -p $out/bin
+    rustc ./solution.rs -out-dir $out/bin
+  '';
 }
