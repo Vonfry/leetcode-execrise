@@ -4,7 +4,37 @@ pub struct Solution {
 
 impl Solution {
     pub fn merge_nodes(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
-        None
+        let mut _fst = &head; // the first element must be 0
+        let mut _snd = &head;
+        let mut result = None;
+        let mut _result = &mut result;
+        let mut sum = 0;
+        loop {
+            if let Some(lst2) = _snd  {
+                if lst2.val == 0 {
+                    _fst = _snd;
+                    if sum != 0 {
+                        match _result {
+                            None => {
+                                *_result = Some(Box::new(ListNode::new(sum)));
+                            },
+                            Some(ref mut rlst)  => {
+                                rlst.next = Some(Box::new(ListNode::new(sum)));
+                                _result = &mut rlst.next;
+                            }
+                        }
+                    }
+                    sum = 0;
+                } else {
+                    sum += lst2.val;
+                }
+                _snd = &lst2.next;
+            } else {
+                break;
+            }
+        };
+
+        result
     }
 }
 
@@ -53,9 +83,11 @@ fn main() {
                 }
             }
         }
+        print!("\n");
+
         let merged = Solution::merge_nodes(input);
         let mut _merged = &merged;
-        print!("output:")
+        print!("output:");
         loop {
             match _merged {
                 None => break,
