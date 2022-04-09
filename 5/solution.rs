@@ -5,53 +5,48 @@ pub struct Solution {
 }
 
 impl Solution {
-    pub fn expand(s: &String, l: i32, r: i32) -> i32 {
-        let (mut left, mut right) = (l, r);
-        let s_chars: Vec<char> = s.chars().collect();
-        while left >= 0 && right < s_chars.len() as i32
-            && s_chars[left as usize] == s_chars[right as usize] {
-            left  -= 1;
-            right += 1;
-        }
-        (right - left - 2) / 2
-    }
-
     pub fn longest_palindrome(s: String) -> String {
-        let mut s_sharp = String::from("#");
+        let mut s_sharp = String::from("^#");
         for c in s.chars() {
             s_sharp.push(c);
             s_sharp.push('#');
         }
+        s_sharp.push('$'); // add these due to range in loop
 
-        let (mut start, mut end) = (0, 0);
-        let (mut right, mut j): (i32, i32)  = (-1, -1);
-        let (mut min_arm, mut cur_arm): (i32, i32);
+        let (mut right, mut j) = (0, 1);
         let mut arms: Vec<usize> = Vec::new();
-        for idx in 0..s_sharp.capacity() {
-            let i = idx as i32;
-            if right < i {
-                cur_arm = Solution::expand(&s_sharp,
-                                           i,
-                                           i);
-            } else {
-                let i_sym = 2 * j - 1;
-                min_arm = min(i_sym, right - i);
-                cur_arm = Solution::expand(&s_sharp,
-                                           i - min_arm,
-                                           i + min_arm);
+        let s_chars: Vec<char> = s_sharp.chars().collect();
+        let char_len = s_chars.len();
+        arms.resize(char_len, 0);
+        for i in 1..(char_len - 1) {
+            let i_sym = if 2 * j > i { 2 * j - i } else { 0 };
+
+            arms[i] = if right > i { min(right - i, arms[i_sym]) } else { 0 };
+
+            loop {
+                let mut l = i - 1 - arms[i];
+                let mut r = i + 1 + arms[i];
+                if l >= 0 && r < char_len && s_chars[l] == s_chars[r] {
+                    arms[i] += 1;
+                } else {
+                    break;
+                }
             }
-            arms.push(cur_arm as usize);
-            let new_right = cur_arm + i;
-            if new_right  > right {
+
+            if i + arms[i] > right {
                 j = i;
-                right = new_right;
-            }
-            if 2 * cur_arm - 1 > end - start {
-                start = i - cur_arm;
-                end   = i + cur_arm;
+                right = i + arms[i];
             }
         }
-        s_sharp[(start as usize)..(end as usize)].replace('#', "")
+
+        match arms.iter().enumerate().max_by(|&x, &y| {
+            x.1.cmp(y.1)
+        }) {
+            Some((center_idx, &max_len)) => {
+                s.chars().skip((center_idx - 1 - max_len) >> 1).take(max_len).collect()
+            },
+            None => String::new(),
+        }
     }
 }
 
