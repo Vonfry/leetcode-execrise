@@ -12,4 +12,6 @@ stdenv.mkDerivation {
     mkdir -p $out/bin
     rustc --out-dir $out/bin ./solution.rs
   '';
+
+  installPhase = "";
 }
